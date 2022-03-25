@@ -3,17 +3,14 @@ package com.lavertis.tasktrackerapi.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Getter
 @Setter
 public class CreateUserRequest {
-    @NotBlank
-    @Size(min = 4, max = 12)
+    @Size(min = 4, max = 12, message = "length must be between 4 and 12")
     private String username;
 
-    @NotBlank
-    @Size(min = 6, max = 16)
+    @Size(min = 6, max = 16, message = "length must be between 6 and 16")
     private String password;
 }

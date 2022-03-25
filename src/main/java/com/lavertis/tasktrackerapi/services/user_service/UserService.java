@@ -7,11 +7,11 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.lavertis.tasktrackerapi.dto.CreateUserRequest;
 import com.lavertis.tasktrackerapi.entities.User;
+import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import com.lavertis.tasktrackerapi.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User findById(long id) {
+    public User findById(long id) throws NotFoundException {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("User with requested id not found"));
@@ -48,7 +48,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User updateById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+    public User updateById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
         var user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("User with requested id not found"));
