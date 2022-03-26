@@ -7,23 +7,29 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.lavertis.tasktrackerapi.dto.CreateUserRequest;
 import com.lavertis.tasktrackerapi.entities.User;
+import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import com.lavertis.tasktrackerapi.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UserService implements IUserService {
+public class UserService implements IUserService, UserDetailsService {
 
     final UserRepository userRepository;
     final ModelMapper modelMapper;
+    final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, ModelMapper modelMapper) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -39,9 +45,20 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User create(CreateUserRequest request) {
+    public User findByUsername(String username) throws NotFoundException {
+        return userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User with requested username not found"));
+    }
+
+    @Override
+    public User create(CreateUserRequest request) throws BadRequestException {
+        var usernameTaken = userRepository.existsByUsername(request.getUsername());
+        if (usernameTaken)
+            throw new BadRequestException("User with specified username already exists");
+
         var user = new User();
-        var encodedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
+        var encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setUsername(request.getUsername());
         user.setPassword(encodedPassword);
         return userRepository.save(user);
@@ -67,5 +84,12 @@ public class UserService implements IUserService {
     @Override
     public void deleteById(long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 }
