@@ -34,7 +34,7 @@ public class AuthController {
 
     @PostMapping("register")
     public ResponseEntity<User> create(@Valid @RequestBody CreateUserRequest request) throws BadRequestException {
-        var user = userService.create(request);
+        var user = userService.createUser(request);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 }

@@ -8,9 +8,11 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.lavertis.tasktrackerapi.dto.CreateUserRequest;
 import com.lavertis.tasktrackerapi.entities.User;
 import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
+import com.lavertis.tasktrackerapi.exceptions.ForbiddenRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import com.lavertis.tasktrackerapi.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,27 +34,35 @@ public class UserService implements IUserService, UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    private User checkRequestUser(long requestedUserId) throws NotFoundException, ForbiddenRequestException {
+        String username = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        User user = findUserByUsername(username);
+        if (user.getId() != requestedUserId)
+            throw new ForbiddenRequestException("Id of the request principal does not match passed user id");
+        return user;
+    }
+
     @Override
-    public List<User> findAll() {
+    public List<User> findAllUsers() {
         return userRepository.findAll();
     }
 
     @Override
-    public User findById(long id) throws NotFoundException {
+    public User findUserById(long id) throws NotFoundException {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("User with requested id not found"));
     }
 
     @Override
-    public User findByUsername(String username) throws NotFoundException {
+    public User findUserByUsername(String username) throws NotFoundException {
         return userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("User with requested username not found"));
     }
 
     @Override
-    public User create(CreateUserRequest request) throws BadRequestException {
+    public User createUser(CreateUserRequest request) throws BadRequestException {
         var usernameTaken = userRepository.existsByUsername(request.getUsername());
         if (usernameTaken)
             throw new BadRequestException("User with specified username already exists");
@@ -65,11 +75,8 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public User updateById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
-        var user = userRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("User with requested id not found"));
-
+    public User updateUserById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException {
+        var user = checkRequestUser(id);
         User userPatched = applyPatchToUser(patch, user);
         userRepository.save(userPatched);
         return userPatched;
@@ -82,7 +89,8 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteUserById(long id) throws NotFoundException, ForbiddenRequestException {
+        checkRequestUser(id);
         userRepository.deleteById(id);
     }
 

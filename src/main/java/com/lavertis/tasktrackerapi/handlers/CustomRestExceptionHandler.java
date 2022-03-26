@@ -1,6 +1,7 @@
 package com.lavertis.tasktrackerapi.handlers;
 
 import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
+import com.lavertis.tasktrackerapi.exceptions.ForbiddenRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import lombok.Getter;
 import org.springframework.http.HttpHeaders;
@@ -52,6 +53,14 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleBadRequestException(BadRequestException ex, WebRequest request) {
         var msg = ex.getLocalizedMessage();
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, msg, msg);
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
+    }
+
+    @ExceptionHandler(ForbiddenRequestException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    protected ResponseEntity<Object> handleForbiddenRequestException(ForbiddenRequestException ex, WebRequest request) {
+        var msg = ex.getLocalizedMessage();
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, msg, msg);
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
     }
 }

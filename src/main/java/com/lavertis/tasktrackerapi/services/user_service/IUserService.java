@@ -6,20 +6,21 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.lavertis.tasktrackerapi.dto.CreateUserRequest;
 import com.lavertis.tasktrackerapi.entities.User;
 import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
+import com.lavertis.tasktrackerapi.exceptions.ForbiddenRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 
 import java.util.List;
 
 public interface IUserService {
-    List<User> findAll();
+    List<User> findAllUsers();
 
-    User findById(long id) throws NotFoundException;
+    User findUserById(long id) throws NotFoundException;
 
-    User findByUsername(String username) throws NotFoundException;
+    User findUserByUsername(String username) throws NotFoundException;
 
-    User create(CreateUserRequest request) throws BadRequestException;
+    User createUser(CreateUserRequest request) throws BadRequestException;
 
-    User updateById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException;
+    User updateUserById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException;
 
-    void deleteById(long id);
+    void deleteUserById(long id) throws NotFoundException, BadRequestException, ForbiddenRequestException;
 }
