@@ -39,7 +39,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task getTaskById(long id) throws NotFoundException {
+    public Task getTaskById(Long id) throws NotFoundException {
         return taskRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Task with id " + id + " not found"));
@@ -57,7 +57,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void deleteTaskById(long id) throws NotFoundException, BadRequestException {
+    public void deleteTaskById(Long id) throws NotFoundException, BadRequestException {
         String username = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User user = userService.findUserByUsername(username);
         Task task = taskRepository
@@ -69,13 +69,13 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public List<Task> getUserTasks(long userId) throws NotFoundException {
+    public List<Task> getUserTasks(Long userId) throws NotFoundException {
         User user = userService.findUserById(userId);
         return taskRepository.findTasksByTaskOwnersContaining(user);
     }
 
     @Override
-    public Task updateTaskById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
+    public Task updateTaskById(Long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
         var task = getTaskById(id);
         Task taskPatched = applyPatchToTask(patch, task);
         taskRepository.save(taskPatched);

@@ -33,19 +33,19 @@ public class UserController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<User> getUserById(@PathVariable long id) throws NotFoundException {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) throws NotFoundException {
         var user = userService.findUserById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PatchMapping(value = "{id}", consumes = "application/json-patch+json")
-    public ResponseEntity<User> updateUserById(@PathVariable long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException {
+    public ResponseEntity<User> updateUserById(@PathVariable Long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException {
         var user = userService.updateUserById(id, patch);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable long id) throws NotFoundException, BadRequestException, ForbiddenRequestException {
+    public ResponseEntity<Void> deleteUserById(@PathVariable Long id) throws NotFoundException, BadRequestException, ForbiddenRequestException {
         userService.deleteUserById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

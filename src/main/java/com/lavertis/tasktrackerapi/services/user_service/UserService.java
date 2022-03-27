@@ -34,10 +34,10 @@ public class UserService implements IUserService, UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    private User checkRequestUser(long requestedUserId) throws NotFoundException, ForbiddenRequestException {
+    private User checkRequestUser(Long requestedUserId) throws NotFoundException, ForbiddenRequestException {
         String username = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User user = findUserByUsername(username);
-        if (user.getId() != requestedUserId)
+        if (user.getId().equals(requestedUserId))
             throw new ForbiddenRequestException("Id of the request principal does not match passed user id");
         return user;
     }
@@ -48,7 +48,7 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public User findUserById(long id) throws NotFoundException {
+    public User findUserById(Long id) throws NotFoundException {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("User with requested id not found"));
@@ -75,7 +75,7 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException {
+    public User updateUserById(Long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException {
         var user = checkRequestUser(id);
         User userPatched = applyPatchToUser(patch, user);
         userRepository.save(userPatched);
@@ -89,7 +89,7 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public void deleteUserById(long id) throws NotFoundException, ForbiddenRequestException {
+    public void deleteUserById(Long id) throws NotFoundException, ForbiddenRequestException {
         checkRequestUser(id);
         userRepository.deleteById(id);
     }

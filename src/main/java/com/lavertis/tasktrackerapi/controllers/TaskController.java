@@ -32,13 +32,13 @@ public class TaskController {
     }
 
     @GetMapping("user/{id}")
-    public ResponseEntity<List<Task>> getUserTasks(@PathVariable long id) throws NotFoundException {
+    public ResponseEntity<List<Task>> getUserTasks(@PathVariable Long id) throws NotFoundException {
         var tasks = taskService.getUserTasks(id);
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable long id) throws NotFoundException {
+    public ResponseEntity<Task> getTaskById(@PathVariable Long id) throws NotFoundException {
         var task = taskService.getTaskById(id);
         return new ResponseEntity<>(task, HttpStatus.OK);
     }
@@ -50,13 +50,13 @@ public class TaskController {
     }
 
     @PatchMapping("{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
         var task = taskService.updateTaskById(id, patch);
         return new ResponseEntity<>(task, HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteTaskById(@PathVariable long id) throws NotFoundException, BadRequestException {
+    public ResponseEntity<Void> deleteTaskById(@PathVariable Long id) throws NotFoundException, BadRequestException {
         taskService.deleteTaskById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

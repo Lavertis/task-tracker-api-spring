@@ -14,13 +14,13 @@ import java.util.List;
 public interface IUserService {
     List<User> findAllUsers();
 
-    User findUserById(long id) throws NotFoundException;
+    User findUserById(Long id) throws NotFoundException;
 
     User findUserByUsername(String username) throws NotFoundException;
 
     User createUser(CreateUserRequest request) throws BadRequestException;
 
-    User updateUserById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException;
+    User updateUserById(Long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException;
 
-    void deleteUserById(long id) throws NotFoundException, BadRequestException, ForbiddenRequestException;
+    void deleteUserById(Long id) throws NotFoundException, BadRequestException, ForbiddenRequestException;
 }
