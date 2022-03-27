@@ -12,6 +12,8 @@ import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import java.util.List;
 
 public interface IUserService {
+    Long getRequestUserId();
+
     List<User> findAllUsers();
 
     User findUserById(Long id) throws NotFoundException;

@@ -12,7 +12,6 @@ import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import com.lavertis.tasktrackerapi.repositories.TaskRepository;
 import com.lavertis.tasktrackerapi.services.user_service.IUserService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,8 +28,10 @@ public class TaskService implements ITaskService {
         this.userService = userService;
     }
 
-    private void checkIfUserIsTaskOwner() {
-
+    @Override
+    public boolean isUserNotTaskOwner(Long userId, Long taskId) throws NotFoundException {
+        var user = userService.findUserById(userId);
+        return !taskRepository.existsTaskByIdAndTaskOwnersContaining(taskId, user);
     }
 
     @Override
@@ -58,8 +59,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public void deleteTaskById(Long id) throws NotFoundException, BadRequestException {
-        String username = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User user = userService.findUserByUsername(username);
+        var userId = userService.getRequestUserId();
+        User user = userService.findUserById(userId);
         Task task = taskRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Task with id " + id + " not found"));

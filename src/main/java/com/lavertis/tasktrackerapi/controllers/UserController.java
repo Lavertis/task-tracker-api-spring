@@ -1,22 +1,20 @@
 package com.lavertis.tasktrackerapi.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import com.lavertis.tasktrackerapi.entities.User;
-import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
-import com.lavertis.tasktrackerapi.exceptions.ForbiddenRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import com.lavertis.tasktrackerapi.services.user_service.IUserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
     final IUserService userService;
@@ -33,20 +31,9 @@ public class UserController {
     }
 
     @GetMapping("{id}")
+    @SecurityRequirements
     public ResponseEntity<User> getUserById(@PathVariable Long id) throws NotFoundException {
         var user = userService.findUserById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
-    }
-
-    @PatchMapping(value = "{id}", consumes = "application/json-patch+json")
-    public ResponseEntity<User> updateUserById(@PathVariable Long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException {
-        var user = userService.updateUserById(id, patch);
-        return new ResponseEntity<>(user, HttpStatus.OK);
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable Long id) throws NotFoundException, BadRequestException, ForbiddenRequestException {
-        userService.deleteUserById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

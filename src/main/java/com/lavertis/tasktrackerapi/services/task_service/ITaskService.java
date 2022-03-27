@@ -11,6 +11,8 @@ import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import java.util.List;
 
 public interface ITaskService {
+    boolean isUserNotTaskOwner(Long userId, Long taskId) throws NotFoundException;
+
     List<Task> getAllTasks();
 
     Task getTaskById(Long id) throws NotFoundException;

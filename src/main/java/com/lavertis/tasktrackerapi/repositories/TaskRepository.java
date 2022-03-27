@@ -11,4 +11,6 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findTasksByTaskOwnersContaining(User taskOwner);
+
+    boolean existsTaskByIdAndTaskOwnersContaining(Long id, User taskOwner);
 }
