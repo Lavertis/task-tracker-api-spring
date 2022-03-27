@@ -12,7 +12,6 @@ import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import com.lavertis.tasktrackerapi.repositories.TaskRepository;
 import com.lavertis.tasktrackerapi.services.user_service.IUserService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,8 +28,10 @@ public class TaskService implements ITaskService {
         this.userService = userService;
     }
 
-    private void checkIfUserIsTaskOwner() {
-
+    @Override
+    public boolean isUserNotTaskOwner(Long userId, Long taskId) throws NotFoundException {
+        var user = userService.findUserById(userId);
+        return !taskRepository.existsTaskByIdAndTaskOwnersContaining(taskId, user);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task getTaskById(long id) throws NotFoundException {
+    public Task getTaskById(Long id) throws NotFoundException {
         return taskRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Task with id " + id + " not found"));
@@ -57,9 +58,9 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void deleteTaskById(long id) throws NotFoundException, BadRequestException {
-        String username = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User user = userService.findUserByUsername(username);
+    public void deleteTaskById(Long id) throws NotFoundException, BadRequestException {
+        var userId = userService.getRequestUserId();
+        User user = userService.findUserById(userId);
         Task task = taskRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Task with id " + id + " not found"));
@@ -69,13 +70,13 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public List<Task> getUserTasks(long userId) throws NotFoundException {
+    public List<Task> getUserTasks(Long userId) throws NotFoundException {
         User user = userService.findUserById(userId);
         return taskRepository.findTasksByTaskOwnersContaining(user);
     }
 
     @Override
-    public Task updateTaskById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
+    public Task updateTaskById(Long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
         var task = getTaskById(id);
         Task taskPatched = applyPatchToTask(patch, task);
         taskRepository.save(taskPatched);

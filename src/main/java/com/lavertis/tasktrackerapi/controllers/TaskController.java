@@ -6,8 +6,10 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.lavertis.tasktrackerapi.dto.CreateTaskRequest;
 import com.lavertis.tasktrackerapi.entities.Task;
 import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
+import com.lavertis.tasktrackerapi.exceptions.ForbiddenRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import com.lavertis.tasktrackerapi.services.task_service.ITaskService;
+import com.lavertis.tasktrackerapi.services.user_service.IUserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +18,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/task")
+@RequestMapping("/api/tasks")
 public class TaskController {
-    final ITaskService taskService;
 
-    public TaskController(ITaskService taskService) {
+    final ITaskService taskService;
+    final IUserService userService;
+
+    public TaskController(ITaskService taskService, IUserService userService) {
         this.taskService = taskService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -31,32 +36,45 @@ public class TaskController {
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
-    @GetMapping("user/{id}")
-    public ResponseEntity<List<Task>> getUserTasks(@PathVariable long id) throws NotFoundException {
-        var tasks = taskService.getUserTasks(id);
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
-    }
+    @GetMapping("{id}/user")
+    public ResponseEntity<Task> getUserTaskById(@PathVariable Long id) throws NotFoundException, ForbiddenRequestException {
+        var userId = userService.getRequestUserId();
+        if (taskService.isUserNotTaskOwner(id, userId))
+            throw new ForbiddenRequestException("You are not allowed to get this task");
 
-    @GetMapping("{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable long id) throws NotFoundException {
         var task = taskService.getTaskById(id);
         return new ResponseEntity<>(task, HttpStatus.OK);
     }
 
-    @PostMapping
+    @GetMapping("user")
+    public ResponseEntity<List<Task>> getUserTasks() throws NotFoundException {
+        var userId = userService.getRequestUserId();
+        var tasks = taskService.getUserTasks(userId);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
+    }
+
+    @PostMapping("user")
     public ResponseEntity<Task> createTask(@RequestBody CreateTaskRequest request) throws NotFoundException {
         var task = taskService.createTask(request);
         return new ResponseEntity<>(task, HttpStatus.OK);
     }
 
-    @PatchMapping("{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
+    @PatchMapping("{id}/user")
+    public ResponseEntity<Task> updateUserTask(@PathVariable Long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException, ForbiddenRequestException {
+        var userId = userService.getRequestUserId();
+        if (taskService.isUserNotTaskOwner(id, userId))
+            throw new ForbiddenRequestException("You are not allowed to update this task");
+
         var task = taskService.updateTaskById(id, patch);
         return new ResponseEntity<>(task, HttpStatus.OK);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteTaskById(@PathVariable long id) throws NotFoundException, BadRequestException {
+    @DeleteMapping("{id}/user")
+    public ResponseEntity<Void> deleteUserTaskById(@PathVariable Long id) throws NotFoundException, BadRequestException, ForbiddenRequestException {
+        var userId = userService.getRequestUserId();
+        if (taskService.isUserNotTaskOwner(id, userId))
+            throw new ForbiddenRequestException("You are not allowed to delete this task");
+
         taskService.deleteTaskById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

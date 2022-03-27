@@ -11,15 +11,17 @@ import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import java.util.List;
 
 public interface ITaskService {
+    boolean isUserNotTaskOwner(Long userId, Long taskId) throws NotFoundException;
+
     List<Task> getAllTasks();
 
-    Task getTaskById(long id) throws NotFoundException;
+    Task getTaskById(Long id) throws NotFoundException;
 
     Task createTask(CreateTaskRequest request) throws NotFoundException;
 
-    void deleteTaskById(long id) throws NotFoundException, BadRequestException;
+    void deleteTaskById(Long id) throws NotFoundException, BadRequestException;
 
-    List<Task> getUserTasks(long userId) throws NotFoundException;
+    List<Task> getUserTasks(Long userId) throws NotFoundException;
 
-    Task updateTaskById(long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException;
+    Task updateTaskById(Long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException;
 }
