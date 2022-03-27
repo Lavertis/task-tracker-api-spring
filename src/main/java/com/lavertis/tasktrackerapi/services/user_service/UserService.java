@@ -1,10 +1,5 @@
 package com.lavertis.tasktrackerapi.services.user_service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import com.lavertis.tasktrackerapi.dto.CreateUserRequest;
 import com.lavertis.tasktrackerapi.entities.User;
 import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
@@ -33,7 +28,7 @@ public class UserService implements IUserService, UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Long getRequestUserId() {
+    public Long getAuthId() {
         return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
     }
 
@@ -50,13 +45,6 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public User findUserByUsername(String username) throws NotFoundException {
-        return userRepository
-                .findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("User with requested username not found"));
-    }
-
-    @Override
     public User createUser(CreateUserRequest request) throws BadRequestException {
         var usernameTaken = userRepository.existsByUsername(request.getUsername());
         if (usernameTaken)
@@ -70,17 +58,22 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserById(Long id, JsonPatch patch) throws JsonPatchException, JsonProcessingException, NotFoundException {
+    public User changeUserPassword(Long id, String newPassword) throws NotFoundException {
+        var encodedPassword = passwordEncoder.encode(newPassword);
         var user = findUserById(id);
-        var userPatched = applyPatchToUser(patch, user);
-        userRepository.save(userPatched);
-        return userPatched;
+        user.setPassword(encodedPassword);
+        return userRepository.save(user);
     }
 
-    private User applyPatchToUser(JsonPatch patch, User targetUser) throws JsonPatchException, JsonProcessingException {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode patched = patch.apply(objectMapper.convertValue(targetUser, JsonNode.class));
-        return objectMapper.treeToValue(patched, User.class);
+    @Override
+    public User changeUserUsername(Long id, String newUsername) throws NotFoundException, BadRequestException {
+        var usernameTaken = userRepository.existsByUsername(newUsername);
+        if (usernameTaken)
+            throw new BadRequestException("User with specified username already exists");
+
+        var user = findUserById(id);
+        user.setUsername(newUsername);
+        return userRepository.save(user);
     }
 
     @Override
