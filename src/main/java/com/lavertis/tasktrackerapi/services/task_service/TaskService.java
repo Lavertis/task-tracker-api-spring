@@ -59,7 +59,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public void deleteTaskById(Long id) throws NotFoundException, BadRequestException {
-        var userId = userService.getRequestUserId();
+        var userId = userService.getAuthId();
         User user = userService.findUserById(userId);
         Task task = taskRepository
                 .findById(id)
