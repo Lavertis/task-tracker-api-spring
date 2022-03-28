@@ -10,7 +10,7 @@ import com.lavertis.tasktrackerapi.entities.Task;
 import com.lavertis.tasktrackerapi.entities.User;
 import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
-import com.lavertis.tasktrackerapi.repositories.TaskRepository;
+import com.lavertis.tasktrackerapi.repositories.ITaskRepository;
 import com.lavertis.tasktrackerapi.services.user_service.IUserService;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +20,10 @@ import java.util.List;
 @Service
 public class TaskService implements ITaskService {
 
-    final TaskRepository taskRepository;
-    final IUserService userService;
+    final private ITaskRepository taskRepository;
+    final private IUserService userService;
 
-    public TaskService(TaskRepository taskRepository, IUserService userService) {
+    public TaskService(ITaskRepository taskRepository, IUserService userService) {
         this.taskRepository = taskRepository;
         this.userService = userService;
     }

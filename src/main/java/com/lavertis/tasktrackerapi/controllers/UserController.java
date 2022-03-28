@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,6 +30,7 @@ public class UserController {
 
     @GetMapping
     @Operation(summary = "Returns all users. Only available for admin.")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<User>> getAllUsers() {
         var users = userService.findAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
@@ -36,6 +38,7 @@ public class UserController {
 
     @GetMapping("{id}")
     @Operation(summary = "Returns a user by id. Only available for admin.")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable Long id) throws NotFoundException {
         var user = userService.findUserById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);

@@ -3,6 +3,9 @@ package com.lavertis.tasktrackerapi.auth;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.lavertis.tasktrackerapi.entities.User;
+import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
+import com.lavertis.tasktrackerapi.services.user_service.IUserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,14 +16,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static com.lavertis.tasktrackerapi.auth.SecurityConstants.*;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
+    final private IUserService userService;
+
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, IUserService userService) {
         super(authenticationManager);
+        this.userService = userService;
     }
 
     @Override
@@ -56,8 +61,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             if (subject == null)
                 return null;
 
-            return new UsernamePasswordAuthenticationToken(subject, null, new ArrayList<>());
-        } catch (SignatureVerificationException e) {
+            User user = userService.findUserById(Long.parseLong(subject));
+            var authorities = user.getAuthorities();
+            return new UsernamePasswordAuthenticationToken(user.getId(), null, authorities);
+        } catch (SignatureVerificationException | NotFoundException e) {
             return null;
         }
     }

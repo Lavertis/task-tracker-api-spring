@@ -8,13 +8,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 
 import static com.lavertis.tasktrackerapi.auth.SecurityConstants.EXPIRATION_TIME;
@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                     new UsernamePasswordAuthenticationToken(
                             user.getUsername(),
                             user.getPassword(),
-                            new ArrayList<>()
+                            user.getAuthorities()
                     )
             );
         } catch (IOException e) {
@@ -54,9 +54,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String token = JWT.create()
                 .withSubject(String.valueOf(user.getId()))
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .withArrayClaim("authorities", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toArray(String[]::new))
                 .sign(Algorithm.HMAC512(SECRET.getBytes()));
 
-        String body = ((User) authResult.getPrincipal()).getUsername() + " " + token;
+        String body = user.getUsername() + " " + token;
 
         response.setContentType("text/plain");
         response.getWriter().write(body);

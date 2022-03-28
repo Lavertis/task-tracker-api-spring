@@ -1,11 +1,12 @@
 package com.lavertis.tasktrackerapi.services.user_service;
 
 import com.lavertis.tasktrackerapi.dto.CreateUserRequest;
+import com.lavertis.tasktrackerapi.entities.Role;
 import com.lavertis.tasktrackerapi.entities.User;
 import com.lavertis.tasktrackerapi.exceptions.BadRequestException;
 import com.lavertis.tasktrackerapi.exceptions.NotFoundException;
-import com.lavertis.tasktrackerapi.repositories.UserRepository;
-import org.modelmapper.ModelMapper;
+import com.lavertis.tasktrackerapi.repositories.IUserRepository;
+import com.lavertis.tasktrackerapi.services.role_service.IRoleService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,13 +19,13 @@ import java.util.List;
 @Service
 public class UserService implements IUserService, UserDetailsService {
 
-    final UserRepository userRepository;
-    final ModelMapper modelMapper;
-    final BCryptPasswordEncoder passwordEncoder;
+    final private IUserRepository userRepository;
+    final private IRoleService roleService;
+    final private BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(IUserRepository userRepository, IRoleService roleService, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -54,6 +55,9 @@ public class UserService implements IUserService, UserDetailsService {
         var encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setUsername(request.getUsername());
         user.setPassword(encodedPassword);
+
+        Role userRole = roleService.getRoleByName("USER");
+        user.addRole(userRole);
         return userRepository.save(user);
     }
 
