@@ -15,7 +15,7 @@ import java.util.*;
 @Setter
 @Getter
 @NoArgsConstructor
-@JsonIgnoreProperties({"enabled", "accountNonLocked", "accountNonExpired", "credentialsNonExpired"})
+@JsonIgnoreProperties({"enabled", "accountNonLocked", "accountNonExpired", "credentialsNonExpired", "roles"})
 public class User implements UserDetails {
 
     @Id

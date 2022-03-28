@@ -63,7 +63,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
             User user = userService.findUserById(Long.parseLong(subject));
             var authorities = user.getAuthorities();
-            return new UsernamePasswordAuthenticationToken(subject, null, authorities);
+            return new UsernamePasswordAuthenticationToken(user.getId(), null, authorities);
         } catch (SignatureVerificationException | NotFoundException e) {
             return null;
         }

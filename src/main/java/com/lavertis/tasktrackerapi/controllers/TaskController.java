@@ -13,6 +13,7 @@ import com.lavertis.tasktrackerapi.services.user_service.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class TaskController {
 
     @GetMapping
     @Operation(summary = "Returns all tasks of all users. Only available to admin.")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Task>> getAllTasks() {
         var tasks = taskService.getAllTasks();
         return new ResponseEntity<>(tasks, HttpStatus.OK);
@@ -38,6 +40,7 @@ public class TaskController {
 
     @GetMapping("{id}")
     @Operation(summary = "Returns a task of any user by task id. Only available to admin.")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Task> getTaskById(@PathVariable Long id) throws NotFoundException {
         var task = taskService.getTaskById(id);
         return new ResponseEntity<>(task, HttpStatus.OK);
