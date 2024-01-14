@@ -3,6 +3,7 @@ package org.lavertis.tasktrackerapi.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -16,4 +17,7 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<Task> tasks;
 }
