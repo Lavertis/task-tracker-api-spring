@@ -1,8 +1,8 @@
 package org.lavertis.tasktrackerapi.controller;
 
 import org.lavertis.tasktrackerapi.utils.JwtTokenUtil;
-import org.lavertis.tasktrackerapi.dto.request.SignInRequest;
-import org.lavertis.tasktrackerapi.dto.response.JwtResponse;
+import org.lavertis.tasktrackerapi.dto.auth.SignInRequest;
+import org.lavertis.tasktrackerapi.dto.auth.JwtResponse;
 import org.lavertis.tasktrackerapi.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

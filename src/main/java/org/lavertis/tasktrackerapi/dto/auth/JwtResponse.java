@@ -1,4 +1,4 @@
-package org.lavertis.tasktrackerapi.dto.response;
+package org.lavertis.tasktrackerapi.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

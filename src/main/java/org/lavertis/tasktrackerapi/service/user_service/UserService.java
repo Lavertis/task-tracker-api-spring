@@ -1,7 +1,8 @@
 package org.lavertis.tasktrackerapi.service.user_service;
 
-import org.lavertis.tasktrackerapi.dto.request.user.CreateUserRequest;
-import org.lavertis.tasktrackerapi.dto.request.user.UpdateUserRequest;
+import org.lavertis.tasktrackerapi.dto.user.CreateUserRequest;
+import org.lavertis.tasktrackerapi.dto.user.UpdateUserRequest;
+import org.lavertis.tasktrackerapi.dto.user.UserResponse;
 import org.lavertis.tasktrackerapi.entity.User;
 import org.lavertis.tasktrackerapi.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,14 @@ public class UserService implements IUserService {
     private PasswordEncoder bcryptEncoder;
 
     @Override
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public UserResponse getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .build();
     }
 
     public User createUser(CreateUserRequest createUserRequest) {
@@ -30,7 +37,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User updateUser(User user, UpdateUserRequest updateUserRequest) {
+    public User updateUser(String username, UpdateUserRequest updateUserRequest) {
+        User user = userRepository.findByUsername(username);
         if (updateUserRequest.getEmail() != null)
             user.setUsername(updateUserRequest.getEmail());
         if (updateUserRequest.getFirstName() != null)

@@ -1,9 +1,9 @@
-package org.lavertis.tasktrackerapi.dto.request.user;
+package org.lavertis.tasktrackerapi.dto.user;
 
 import lombok.Data;
 
 @Data
-public class UpdateUserRequest {
+public class CreateUserRequest {
     private String email;
     private String password;
     private String firstName;
