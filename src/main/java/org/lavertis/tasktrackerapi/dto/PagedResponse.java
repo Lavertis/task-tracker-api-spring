@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class PagedResponse <T>{
     private List<T> items;
-    private int totalCount;
+    private Long totalCount;
 }

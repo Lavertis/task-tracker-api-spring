@@ -3,9 +3,11 @@ package org.lavertis.tasktrackerapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.lavertis.tasktrackerapi.dto.task.CreateTaskRequest;
+import org.lavertis.tasktrackerapi.dto.task.TaskQuery;
 import org.lavertis.tasktrackerapi.dto.task.UpdateTaskRequest;
 import org.lavertis.tasktrackerapi.service.task_service.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +31,8 @@ public class TaskController {
 
     @GetMapping
     @Operation(summary = "Get all User's tasks")
-    public ResponseEntity<?> getTasks(Principal principal) {
-        return ResponseEntity.ok(taskService.getTasks(principal.getName()));
+    public ResponseEntity<?> getTasks(@ModelAttribute TaskQuery taskQuery, Principal principal) {
+        return ResponseEntity.ok(taskService.getTasks(taskQuery, principal.getName()));
     }
 
     @PostMapping

@@ -1,7 +1,13 @@
 package org.lavertis.tasktrackerapi.service.task_service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.lavertis.tasktrackerapi.dto.PagedResponse;
 import org.lavertis.tasktrackerapi.dto.task.CreateTaskRequest;
+import org.lavertis.tasktrackerapi.dto.task.TaskQuery;
 import org.lavertis.tasktrackerapi.dto.task.TaskResponse;
 import org.lavertis.tasktrackerapi.dto.task.UpdateTaskRequest;
 import org.lavertis.tasktrackerapi.entity.Task;
@@ -12,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class TaskService implements ITaskService {
@@ -20,6 +28,8 @@ public class TaskService implements ITaskService {
     private ITaskRepository taskRepository;
     @Autowired
     private IUserRepository userRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @Override
     public TaskResponse getTaskById(UUID id) {
@@ -36,20 +46,57 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public PagedResponse<TaskResponse> getTasks(String username) {
-        List<Task> tasks = taskRepository.findAllByUserUsername(username);
-        List<TaskResponse> taskResponses = tasks.stream().map(task -> TaskResponse.builder()
-                .id(task.getId())
-                .title(task.getTitle())
-                .description(task.getDescription())
-                .completed(task.getCompleted())
-                .priority(task.getPriority())
-                .dueDate(task.getDueDate())
-                .userId(task.getUser().getId())
+    public PagedResponse<TaskResponse> getTasks(TaskQuery taskQuery, String username) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Task> cq = cb.createQuery(Task.class);
+//        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+
+        Root<Task> task = cq.from(Task.class);
+//        Root<Task> countRoot = countQuery.from(Task.class);
+
+        Predicate titlePredicate = null;
+        if (!taskQuery.getSearchTitle().isEmpty())
+            titlePredicate = cb.like(cb.lower(task.get("title")), "%" + taskQuery.getSearchTitle().toLowerCase() + "%");
+
+        Predicate completedPredicate = null;
+        if (taskQuery.getHideCompleted() != null && taskQuery.getHideCompleted())
+            completedPredicate = cb.equal(task.get("completed"), false);
+
+        Predicate userPredicate = null;
+        if (username != null)
+            userPredicate = cb.equal(task.get("user").get("username"), username);
+
+        var predicates = Stream.of(titlePredicate, completedPredicate, userPredicate)
+                .filter(Objects::nonNull)
+                .toArray(Predicate[]::new);
+        cq.where(predicates);
+        cq.orderBy(cb.asc(task.get("dueDate")));
+
+//        countQuery.select(cb.count(countRoot)).where(predicates);
+//        Long totalCount = entityManager.createQuery(countQuery).getSingleResult();
+
+        List<Task> tasks;
+        if (taskQuery.getRangeStart() != null && taskQuery.getRangeEnd() != null) {
+            tasks = entityManager.createQuery(cq)
+                    .setFirstResult(taskQuery.getRangeStart())
+                    .setMaxResults(taskQuery.getRangeEnd() - taskQuery.getRangeStart())
+                    .getResultList();
+        } else {
+            tasks = entityManager.createQuery(cq).getResultList();
+        }
+
+        List<TaskResponse> taskResponses = tasks.stream().map(taskEntity -> TaskResponse.builder()
+                .id(taskEntity.getId())
+                .title(taskEntity.getTitle())
+                .description(taskEntity.getDescription())
+                .completed(taskEntity.getCompleted())
+                .priority(taskEntity.getPriority())
+                .dueDate(taskEntity.getDueDate())
+                .userId(taskEntity.getUser().getId())
                 .build()
         ).toList();
         PagedResponse<TaskResponse> response = new PagedResponse<>();
-        response.setTotalCount(tasks.size());
+        response.setTotalCount(5L);
         response.setItems(taskResponses);
         return response;
     }
