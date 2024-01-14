@@ -1,10 +1,12 @@
 package org.lavertis.tasktrackerapi.service.task_service;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
+import org.hibernate.query.sqm.tree.SqmCopyContext;
+import org.hibernate.query.sqm.tree.select.SqmSelectStatement;
+import org.hibernate.query.sqm.tree.select.SqmSubQuery;
 import org.lavertis.tasktrackerapi.dto.PagedResponse;
 import org.lavertis.tasktrackerapi.dto.task.CreateTaskRequest;
 import org.lavertis.tasktrackerapi.dto.task.TaskQuery;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -49,10 +52,7 @@ public class TaskService implements ITaskService {
     public PagedResponse<TaskResponse> getTasks(TaskQuery taskQuery, String username) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Task> cq = cb.createQuery(Task.class);
-//        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-
         Root<Task> task = cq.from(Task.class);
-//        Root<Task> countRoot = countQuery.from(Task.class);
 
         Predicate titlePredicate = null;
         if (!taskQuery.getSearchTitle().isEmpty())
@@ -72,18 +72,19 @@ public class TaskService implements ITaskService {
         cq.where(predicates);
         cq.orderBy(cb.asc(task.get("dueDate")));
 
-//        countQuery.select(cb.count(countRoot)).where(predicates);
-//        Long totalCount = entityManager.createQuery(countQuery).getSingleResult();
+        var countQuery = entityManager.createQuery(cq);
+        var totalCount = countQuery.getResultList().size();
 
-        List<Task> tasks;
+        TypedQuery<Task> tasksQuery;
         if (taskQuery.getRangeStart() != null && taskQuery.getRangeEnd() != null) {
-            tasks = entityManager.createQuery(cq)
+            tasksQuery = entityManager.createQuery(cq)
                     .setFirstResult(taskQuery.getRangeStart())
-                    .setMaxResults(taskQuery.getRangeEnd() - taskQuery.getRangeStart())
-                    .getResultList();
+                    .setMaxResults(taskQuery.getRangeEnd() - taskQuery.getRangeStart());
         } else {
-            tasks = entityManager.createQuery(cq).getResultList();
+            tasksQuery = entityManager.createQuery(cq);
         }
+
+        List<Task> tasks = tasksQuery.getResultList();
 
         List<TaskResponse> taskResponses = tasks.stream().map(taskEntity -> TaskResponse.builder()
                 .id(taskEntity.getId())
@@ -96,7 +97,7 @@ public class TaskService implements ITaskService {
                 .build()
         ).toList();
         PagedResponse<TaskResponse> response = new PagedResponse<>();
-        response.setTotalCount(5L);
+        response.setTotalCount((long)totalCount);
         response.setItems(taskResponses);
         return response;
     }
