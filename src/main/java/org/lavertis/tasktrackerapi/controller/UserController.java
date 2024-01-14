@@ -30,4 +30,9 @@ public class UserController {
     public ResponseEntity<?> updateCurrentUser(@RequestBody UpdateUserRequest updateUserRequest, Principal principal) {
         return ResponseEntity.ok(userService.updateUser(principal.getName(), updateUserRequest));
     }
+
+    @DeleteMapping("/current")
+    public ResponseEntity<?> deleteCurrentUser(Principal principal) {
+        return ResponseEntity.ok(userService.deleteUser(principal.getName()));
+    }
 }

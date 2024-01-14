@@ -49,4 +49,14 @@ public class UserService implements IUserService {
             user.setPassword(bcryptEncoder.encode(updateUserRequest.getPassword()));
         return userRepository.save(user);
     }
+
+    @Override
+    public boolean deleteUser(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            userRepository.delete(user);
+            return true;
+        }
+        return false;
+    }
 }
