@@ -1,9 +1,11 @@
 package org.lavertis.tasktrackerapi.dto.task;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.lavertis.tasktrackerapi.dto.PaginationQuery;
 
-@Data
+@Getter
+@Setter
 public class TaskQuery extends PaginationQuery {
     private String searchTitle;
     private Boolean hideCompleted;

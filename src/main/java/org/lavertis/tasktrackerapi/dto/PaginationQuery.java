@@ -1,8 +1,10 @@
 package org.lavertis.tasktrackerapi.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class PaginationQuery {
     private Integer rangeStart;
     private Integer rangeEnd;

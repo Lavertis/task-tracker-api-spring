@@ -1,43 +1,37 @@
 package org.lavertis.tasktrackerapi.service.user_service;
 
+import lombok.AllArgsConstructor;
+import org.lavertis.tasktrackerapi.converter.UserMapper;
 import org.lavertis.tasktrackerapi.dto.user.CreateUserRequest;
 import org.lavertis.tasktrackerapi.dto.user.UpdateUserRequest;
 import org.lavertis.tasktrackerapi.dto.user.UserResponse;
 import org.lavertis.tasktrackerapi.entity.User;
 import org.lavertis.tasktrackerapi.repository.IUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class UserService implements IUserService {
-    @Autowired
     private IUserRepository userRepository;
-    @Autowired
     private PasswordEncoder bcryptEncoder;
+    private UserMapper userMapper;
 
     @Override
     public UserResponse getUserByUsername(String username) {
         User user = userRepository.findByUsername(username);
-        return UserResponse.builder()
-                .id(user.getId())
-                .email(user.getUsername())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .build();
+        return userMapper.mapUserToUserResponse(user);
     }
 
-    public User createUser(CreateUserRequest createUserRequest) {
-        User newUser = new User();
-        newUser.setUsername(createUserRequest.getEmail());
-        newUser.setPassword(bcryptEncoder.encode(createUserRequest.getPassword()));
-        newUser.setFirstName(createUserRequest.getFirstName());
-        newUser.setLastName(createUserRequest.getLastName());
-        return userRepository.save(newUser);
+    public UserResponse createUser(CreateUserRequest createUserRequest) {
+        User user = userMapper.mapCreateUserRequestToUser(createUserRequest);
+        user.setPassword(bcryptEncoder.encode(createUserRequest.getPassword()));
+        user = userRepository.save(user);
+        return userMapper.mapUserToUserResponse(user);
     }
 
     @Override
-    public User updateUser(String username, UpdateUserRequest updateUserRequest) {
+    public UserResponse updateUser(String username, UpdateUserRequest updateUserRequest) {
         User user = userRepository.findByUsername(username);
         if (updateUserRequest.getEmail() != null)
             user.setUsername(updateUserRequest.getEmail());
@@ -47,7 +41,8 @@ public class UserService implements IUserService {
             user.setLastName(updateUserRequest.getLastName());
         if (updateUserRequest.getPassword() != null)
             user.setPassword(bcryptEncoder.encode(updateUserRequest.getPassword()));
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        return userMapper.mapUserToUserResponse(user);
     }
 
     @Override

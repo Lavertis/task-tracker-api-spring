@@ -2,8 +2,10 @@ package org.lavertis.tasktrackerapi.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.AllArgsConstructor;
 import org.lavertis.tasktrackerapi.dto.task.CreateTaskRequest;
 import org.lavertis.tasktrackerapi.dto.task.TaskQuery;
+import org.lavertis.tasktrackerapi.dto.task.TaskResponse;
 import org.lavertis.tasktrackerapi.dto.task.UpdateTaskRequest;
 import org.lavertis.tasktrackerapi.service.task_service.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,10 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin
+@AllArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/tasks")
 public class TaskController {
-    @Autowired
     private ITaskService taskService;
 
     @GetMapping("/{id}")
@@ -37,20 +39,20 @@ public class TaskController {
 
     @PostMapping
     @Operation(summary = "Create task")
-    public ResponseEntity<?> createTask(@RequestBody CreateTaskRequest request, Principal principal) {
+    public ResponseEntity<TaskResponse> createTask(@RequestBody CreateTaskRequest request, Principal principal) {
         return ResponseEntity.ok(taskService.createTask(request, principal.getName()));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update task")
-    public ResponseEntity<?> updateTask(@PathVariable UUID id, @RequestBody UpdateTaskRequest request, Principal principal) {
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable UUID id, @RequestBody UpdateTaskRequest request, Principal principal) {
         // TODO: check if user is owner of task
         return ResponseEntity.ok(taskService.updateTask(id, request));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete task")
-    public ResponseEntity<?> deleteTask(@PathVariable UUID id, Principal principal) {
+    public ResponseEntity<Boolean> deleteTask(@PathVariable UUID id, Principal principal) {
         // TODO: check if user is owner of task
         taskService.deleteTask(id);
         return ResponseEntity.ok(true);
