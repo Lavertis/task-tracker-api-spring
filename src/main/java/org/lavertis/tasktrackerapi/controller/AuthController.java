@@ -25,7 +25,7 @@ public class AuthController {
     private JwtUserDetailsService userDetailsService;
 
     @RequestMapping(value = "/sign-in", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody SignInRequest signInRequest) throws Exception {
+    public ResponseEntity<JwtResponse> signIn(@RequestBody SignInRequest signInRequest) throws Exception {
         authenticate(signInRequest.getEmail(), signInRequest.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(signInRequest.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);

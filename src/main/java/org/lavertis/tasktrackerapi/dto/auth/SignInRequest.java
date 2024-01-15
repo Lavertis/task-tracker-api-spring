@@ -1,11 +1,10 @@
 package org.lavertis.tasktrackerapi.dto.auth;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-@Data
+@Getter
+@Setter
 public class SignInRequest {
     private String email;
     private String password;
