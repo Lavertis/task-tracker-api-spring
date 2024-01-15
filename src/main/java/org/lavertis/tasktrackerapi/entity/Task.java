@@ -17,7 +17,7 @@ public class Task {
 
     private String title;
     private String description;
-    private Boolean completed;
+    private Boolean completed = false;
     private Integer priority;
     private Date dueDate;
 
