@@ -2,14 +2,13 @@ package org.lavertis.tasktrackerapi.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.lavertis.tasktrackerapi.dto.task.CreateTaskRequest;
 import org.lavertis.tasktrackerapi.dto.task.TaskQuery;
 import org.lavertis.tasktrackerapi.dto.task.TaskResponse;
 import org.lavertis.tasktrackerapi.dto.task.UpdateTaskRequest;
 import org.lavertis.tasktrackerapi.service.task_service.ITaskService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ import java.util.UUID;
 public class TaskController {
     private ITaskService taskService;
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     @Operation(summary = "Get task by id")
     public ResponseEntity<?> getTaskById(@PathVariable UUID id, Principal principal) {
         // TODO: check if user is owner of task
@@ -39,13 +38,20 @@ public class TaskController {
 
     @PostMapping
     @Operation(summary = "Create task")
-    public ResponseEntity<TaskResponse> createTask(@RequestBody CreateTaskRequest request, Principal principal) {
+    public ResponseEntity<TaskResponse> createTask(
+            @RequestBody @Valid CreateTaskRequest request,
+            Principal principal
+    ) {
         return ResponseEntity.ok(taskService.createTask(request, principal.getName()));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("{id}")
     @Operation(summary = "Update task")
-    public ResponseEntity<TaskResponse> updateTask(@PathVariable UUID id, @RequestBody UpdateTaskRequest request, Principal principal) {
+    public ResponseEntity<TaskResponse> updateTask(
+            @PathVariable UUID id,
+            @RequestBody @Valid UpdateTaskRequest request,
+            Principal principal
+    ) {
         // TODO: check if user is owner of task
         return ResponseEntity.ok(taskService.updateTask(id, request));
     }

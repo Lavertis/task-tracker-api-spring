@@ -54,4 +54,9 @@ public class UserService implements IUserService {
         }
         return false;
     }
+
+    @Override
+    public boolean isEmailExist(String email) {
+        return userRepository.findByUsername(email) != null;
+    }
 }

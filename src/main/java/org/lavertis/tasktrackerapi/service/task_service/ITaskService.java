@@ -5,7 +5,6 @@ import org.lavertis.tasktrackerapi.dto.task.CreateTaskRequest;
 import org.lavertis.tasktrackerapi.dto.task.TaskQuery;
 import org.lavertis.tasktrackerapi.dto.task.TaskResponse;
 import org.lavertis.tasktrackerapi.dto.task.UpdateTaskRequest;
-import org.lavertis.tasktrackerapi.entity.Task;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;

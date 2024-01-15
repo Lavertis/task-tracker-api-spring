@@ -1,6 +1,6 @@
 package org.lavertis.tasktrackerapi.dto.task;
 
-import lombok.Data;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,9 +9,16 @@ import java.util.Date;
 @Getter
 @Setter
 public class CreateTaskRequest {
+    @NotEmpty(message = "Title cannot be empty")
+    @Size(max = 64, message = "Title cannot be longer than 64 characters")
     private String title;
+
+    @Size(max = 255, message = "Description cannot be longer than 255 characters")
     private String description;
-    private Boolean completed;
+
+    @NotNull(message = "Priority cannot be empty")
     private Integer priority;
+
+    @FutureOrPresent(message = "Due date must be in the present or future")
     private Date dueDate;
 }

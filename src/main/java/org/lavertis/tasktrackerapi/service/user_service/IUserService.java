@@ -9,4 +9,5 @@ public interface IUserService {
     UserResponse createUser(CreateUserRequest createUserRequest);
     UserResponse updateUser(String username, UpdateUserRequest updateUserRequest);
     boolean deleteUser(String username);
+    boolean isEmailExist(String email);
 }

@@ -3,6 +3,7 @@ package org.lavertis.tasktrackerapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.lavertis.tasktrackerapi.dto.user.CreateUserRequest;
 import org.lavertis.tasktrackerapi.dto.user.UpdateUserRequest;
@@ -23,8 +24,8 @@ public class UserController {
 
     @PostMapping()
     @Operation(summary = "User sign up")
-    public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest createUserRequest) {
-        return ResponseEntity.ok(userService.createUser(createUserRequest));
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
+        return ResponseEntity.ok(userService.createUser(request));
     }
 
     @GetMapping("/current")
@@ -37,8 +38,11 @@ public class UserController {
     @PatchMapping("/current")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Update current user")
-    public ResponseEntity<UserResponse> updateCurrentUser(@RequestBody UpdateUserRequest updateUserRequest, Principal principal) {
-        return ResponseEntity.ok(userService.updateUser(principal.getName(), updateUserRequest));
+    public ResponseEntity<UserResponse> updateCurrentUser(
+            @RequestBody @Valid UpdateUserRequest request,
+            Principal principal
+    ) {
+        return ResponseEntity.ok(userService.updateUser(principal.getName(), request));
     }
 
     @DeleteMapping("/current")
