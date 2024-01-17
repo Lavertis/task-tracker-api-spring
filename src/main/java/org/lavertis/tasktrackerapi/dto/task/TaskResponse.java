@@ -1,6 +1,7 @@
 package org.lavertis.tasktrackerapi.dto.task;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.lavertis.tasktrackerapi.dto.tag.TagResponse;
 
 import java.util.Date;

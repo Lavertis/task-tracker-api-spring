@@ -14,8 +14,6 @@ import org.lavertis.tasktrackerapi.service.user_service.IUserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-
 @RestController
 @CrossOrigin
 @AllArgsConstructor

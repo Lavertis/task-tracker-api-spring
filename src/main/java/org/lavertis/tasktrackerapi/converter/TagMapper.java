@@ -9,5 +9,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface TagMapper {
     TagResponse mapTagToTagResponse(Tag tag);
+
     List<TagResponse> mapTagsToTagResponses(List<Tag> tags);
 }

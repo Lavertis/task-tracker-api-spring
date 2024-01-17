@@ -31,8 +31,8 @@ public class DatabaseSeeder implements ApplicationRunner {
         }
         List<Tag> tags = new ArrayList<>();
         String[] taskRelatedTagNames = {"Research", "Design", "Development", "Testing", "Review", "Documentation", "Refactoring", "BugFixing", "Maintenance", "Deployment"};
-        for (int i = 1; i <= 10; i++) {
-            Tag tag = new Tag(UUID.randomUUID(), taskRelatedTagNames[i-1]);
+        for (int i = 1; i <= taskRelatedTagNames.length; i++) {
+            Tag tag = new Tag(UUID.randomUUID(), taskRelatedTagNames[i - 1]);
             tags.add(tag);
         }
         tagRepository.saveAll(tags);

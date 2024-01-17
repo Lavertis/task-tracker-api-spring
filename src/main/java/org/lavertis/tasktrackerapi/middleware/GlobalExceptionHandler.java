@@ -3,15 +3,15 @@ package org.lavertis.tasktrackerapi.middleware;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.lavertis.tasktrackerapi.exceptions.ForbiddenRequestException;
+import org.lavertis.tasktrackerapi.exceptions.NotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.validation.FieldError;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +46,15 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<Object> handleForbiddenRequestException(ForbiddenRequestException ex) {
         var msg = ex.getLocalizedMessage();
         ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, msg, msg);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    protected ResponseEntity<Object> handleNotFoundException(NotFoundException ex) {
+        var msg = ex.getLocalizedMessage();
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, msg, msg);
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 }

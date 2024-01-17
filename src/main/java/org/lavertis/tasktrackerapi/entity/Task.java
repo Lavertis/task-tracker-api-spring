@@ -1,11 +1,11 @@
 package org.lavertis.tasktrackerapi.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -35,7 +35,7 @@ public class Task {
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
 
-    @Column(name = "user_id", insertable=false, updatable=false)
+    @Column(name = "user_id", insertable = false, updatable = false)
     private UUID userId;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

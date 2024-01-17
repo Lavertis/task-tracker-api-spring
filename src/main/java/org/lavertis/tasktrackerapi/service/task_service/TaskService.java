@@ -13,9 +13,9 @@ import org.lavertis.tasktrackerapi.dto.task.CreateTaskRequest;
 import org.lavertis.tasktrackerapi.dto.task.TaskQuery;
 import org.lavertis.tasktrackerapi.dto.task.TaskResponse;
 import org.lavertis.tasktrackerapi.dto.task.UpdateTaskRequest;
+import org.lavertis.tasktrackerapi.entity.AppUser;
 import org.lavertis.tasktrackerapi.entity.Tag;
 import org.lavertis.tasktrackerapi.entity.Task;
-import org.lavertis.tasktrackerapi.entity.AppUser;
 import org.lavertis.tasktrackerapi.repository.ITagRepository;
 import org.lavertis.tasktrackerapi.repository.ITaskRepository;
 import org.lavertis.tasktrackerapi.repository.IUserRepository;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 

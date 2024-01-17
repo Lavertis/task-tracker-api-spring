@@ -1,6 +1,7 @@
 package org.lavertis.tasktrackerapi.dto.user;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
