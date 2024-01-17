@@ -14,7 +14,7 @@ import org.lavertis.tasktrackerapi.dto.task.TaskQuery;
 import org.lavertis.tasktrackerapi.dto.task.TaskResponse;
 import org.lavertis.tasktrackerapi.dto.task.UpdateTaskRequest;
 import org.lavertis.tasktrackerapi.entity.Task;
-import org.lavertis.tasktrackerapi.entity.User;
+import org.lavertis.tasktrackerapi.entity.AppUser;
 import org.lavertis.tasktrackerapi.repository.ITaskRepository;
 import org.lavertis.tasktrackerapi.repository.IUserRepository;
 import org.springframework.stereotype.Service;
@@ -87,7 +87,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskResponse createTask(CreateTaskRequest request, String username) {
-        User user = userRepository.findByUsername(username);
+        AppUser user = userRepository.findByUsername(username);
         Task task = taskMapper.mapCreateTaskRequestToTask(request);
         task.setUser(user);
         task = taskRepository.save(task);

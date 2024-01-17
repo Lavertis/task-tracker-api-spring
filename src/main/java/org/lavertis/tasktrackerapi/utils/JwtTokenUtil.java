@@ -3,8 +3,8 @@ package org.lavertis.tasktrackerapi.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.lavertis.tasktrackerapi.entity.AppUser;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serial;
@@ -22,7 +22,7 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String secret;
 
-    public String getUsernameFromToken(String token) {
+    public String getSubjectFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
@@ -55,9 +55,10 @@ public class JwtTokenUtil implements Serializable {
         return false;
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(AppUser user) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        claims.put("email", user.getUsername());
+        return doGenerateToken(claims, user.getId().toString());
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
@@ -72,8 +73,8 @@ public class JwtTokenUtil implements Serializable {
         return (!isTokenExpired(token) || ignoreTokenExpiration(token));
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    public Boolean validateToken(String token, AppUser user) {
+        final String userId = getSubjectFromToken(token);
+        return userId.equals(user.getId().toString()) && !isTokenExpired(token);
     }
 }

@@ -1,16 +1,16 @@
 package org.lavertis.tasktrackerapi.controller;
 
+import org.lavertis.tasktrackerapi.entity.AppUser;
+import org.lavertis.tasktrackerapi.service.user_service.IUserService;
 import org.lavertis.tasktrackerapi.utils.JwtTokenUtil;
 import org.lavertis.tasktrackerapi.dto.auth.SignInRequest;
 import org.lavertis.tasktrackerapi.dto.auth.JwtResponse;
-import org.lavertis.tasktrackerapi.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,13 +22,13 @@ public class AuthController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
-    private JwtUserDetailsService userDetailsService;
+    private IUserService userService;
 
     @RequestMapping(value = "/sign-in", method = RequestMethod.POST)
     public ResponseEntity<JwtResponse> signIn(@RequestBody SignInRequest signInRequest) throws Exception {
         authenticate(signInRequest.getEmail(), signInRequest.getPassword());
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(signInRequest.getEmail());
-        final String token = jwtTokenUtil.generateToken(userDetails);
+        final AppUser user = userService.getUserByUsername(signInRequest.getEmail());
+        final String token = jwtTokenUtil.generateToken(user);
         return ResponseEntity.ok(new JwtResponse(token));
     }
 

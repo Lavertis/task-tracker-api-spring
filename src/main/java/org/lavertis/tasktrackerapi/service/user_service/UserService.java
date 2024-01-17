@@ -5,26 +5,35 @@ import org.lavertis.tasktrackerapi.converter.UserMapper;
 import org.lavertis.tasktrackerapi.dto.user.CreateUserRequest;
 import org.lavertis.tasktrackerapi.dto.user.UpdateUserRequest;
 import org.lavertis.tasktrackerapi.dto.user.UserResponse;
-import org.lavertis.tasktrackerapi.entity.User;
+import org.lavertis.tasktrackerapi.entity.AppUser;
 import org.lavertis.tasktrackerapi.repository.IUserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @AllArgsConstructor
-public class UserService implements IUserService {
+public class UserService implements IUserService, UserDetailsService {
     private IUserRepository userRepository;
     private PasswordEncoder bcryptEncoder;
     private UserMapper userMapper;
 
     @Override
-    public UserResponse getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
-        return userMapper.mapUserToUserResponse(user);
+    public AppUser getUserById(UUID id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public AppUser getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     public UserResponse createUser(CreateUserRequest createUserRequest) {
-        User user = userMapper.mapCreateUserRequestToUser(createUserRequest);
+        AppUser user = userMapper.mapCreateUserRequestToUser(createUserRequest);
         user.setPassword(bcryptEncoder.encode(createUserRequest.getPassword()));
         user = userRepository.save(user);
         return userMapper.mapUserToUserResponse(user);
@@ -32,7 +41,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserResponse updateUser(String username, UpdateUserRequest updateUserRequest) {
-        User user = userRepository.findByUsername(username);
+        AppUser user = userRepository.findByUsername(username);
         if (updateUserRequest.getEmail() != null)
             user.setUsername(updateUserRequest.getEmail());
         if (updateUserRequest.getFirstName() != null)
@@ -47,7 +56,7 @@ public class UserService implements IUserService {
 
     @Override
     public boolean deleteUser(String username) {
-        User user = userRepository.findByUsername(username);
+        AppUser user = userRepository.findByUsername(username);
         if (user != null) {
             userRepository.delete(user);
             return true;
@@ -58,5 +67,10 @@ public class UserService implements IUserService {
     @Override
     public boolean isEmailExist(String email) {
         return userRepository.findByUsername(email) != null;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username);
     }
 }

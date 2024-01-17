@@ -1,15 +1,15 @@
 package org.lavertis.tasktrackerapi.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.lavertis.tasktrackerapi.converter.UserMapper;
 import org.lavertis.tasktrackerapi.dto.user.CreateUserRequest;
 import org.lavertis.tasktrackerapi.dto.user.UpdateUserRequest;
 import org.lavertis.tasktrackerapi.dto.user.UserResponse;
+import org.lavertis.tasktrackerapi.entity.AppUser;
 import org.lavertis.tasktrackerapi.service.user_service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +21,7 @@ import java.security.Principal;
 @RequestMapping("/users")
 public class UserController {
     private IUserService userService;
+    private UserMapper userMapper;
 
     @PostMapping()
     @Operation(summary = "User sign up")
@@ -32,7 +33,9 @@ public class UserController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get current user")
     public ResponseEntity<UserResponse> getCurrentUser(Principal principal) {
-        return ResponseEntity.ok(userService.getUserByUsername(principal.getName()));
+        AppUser user = userService.getUserByUsername(principal.getName());
+        UserResponse userResponse = userMapper.mapUserToUserResponse(user);
+        return ResponseEntity.ok(userResponse);
     }
 
     @PatchMapping("/current")

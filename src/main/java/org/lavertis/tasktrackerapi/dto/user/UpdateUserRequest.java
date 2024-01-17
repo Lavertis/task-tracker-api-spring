@@ -2,6 +2,7 @@ package org.lavertis.tasktrackerapi.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.lavertis.tasktrackerapi.validation.unique_username.UniqueUsername;
@@ -13,7 +14,7 @@ public class UpdateUserRequest {
     @UniqueUsername(message = "Email already exists")
     private String email;
 
-    @Min(value = 6, message = "Password must be at least 6 characters long")
+    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
     private String firstName;
