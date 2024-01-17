@@ -7,7 +7,6 @@ import org.lavertis.tasktrackerapi.dto.user.UpdateUserRequest;
 import org.lavertis.tasktrackerapi.dto.user.UserResponse;
 import org.lavertis.tasktrackerapi.entity.AppUser;
 import org.lavertis.tasktrackerapi.repository.IUserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,8 +39,8 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public UserResponse updateUser(String username, UpdateUserRequest updateUserRequest) {
-        AppUser user = userRepository.findByUsername(username);
+    public UserResponse updateUser(UUID userId, UpdateUserRequest updateUserRequest) {
+        AppUser user = userRepository.findById(userId).orElseThrow();
         if (updateUserRequest.getEmail() != null)
             user.setUsername(updateUserRequest.getEmail());
         if (updateUserRequest.getFirstName() != null)
@@ -55,8 +54,8 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public boolean deleteUser(String username) {
-        AppUser user = userRepository.findByUsername(username);
+    public boolean deleteUser(UUID userId) {
+        AppUser user = userRepository.findById(userId).orElse(null);
         if (user != null) {
             userRepository.delete(user);
             return true;
@@ -70,7 +69,7 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public AppUser loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username);
     }
 }

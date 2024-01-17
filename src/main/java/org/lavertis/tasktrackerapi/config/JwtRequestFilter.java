@@ -9,7 +9,6 @@ import org.lavertis.tasktrackerapi.entity.AppUser;
 import org.lavertis.tasktrackerapi.service.user_service.IUserService;
 import org.lavertis.tasktrackerapi.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -51,9 +50,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             AppUser appUser = userService.getUserById(UUID.fromString(userId));
             if (jwtTokenUtil.validateToken(jwtToken, appUser)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(appUser, null, appUser.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                AppUserAuthentication appUserAuthentication = new AppUserAuthentication(appUser);
+                appUserAuthentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(appUserAuthentication);
             }
         }
         chain.doFilter(request, response);

@@ -11,7 +11,7 @@ public interface IUserService {
     AppUser getUserById(UUID id);
     AppUser getUserByUsername(String username);
     UserResponse createUser(CreateUserRequest createUserRequest);
-    UserResponse updateUser(String username, UpdateUserRequest updateUserRequest);
-    boolean deleteUser(String username);
+    UserResponse updateUser(UUID userId, UpdateUserRequest updateUserRequest);
+    boolean deleteUser(UUID userId);
     boolean isEmailExist(String email);
 }

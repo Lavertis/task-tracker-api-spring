@@ -39,7 +39,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public PagedResponse<TaskResponse> getTasks(TaskQuery taskQuery, String username) {
+    public PagedResponse<TaskResponse> getUserTasks(TaskQuery taskQuery, UUID userId) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Task> cq = cb.createQuery(Task.class);
         Root<Task> task = cq.from(Task.class);
@@ -53,8 +53,8 @@ public class TaskService implements ITaskService {
             completedPredicate = cb.equal(task.get("completed"), false);
 
         Predicate userPredicate = null;
-        if (username != null)
-            userPredicate = cb.equal(task.get("user").get("username"), username);
+        if (userId != null)
+            userPredicate = cb.equal(task.get("user").get("id"), userId);
 
         var predicates = Stream.of(titlePredicate, completedPredicate, userPredicate)
                 .filter(Objects::nonNull)
@@ -86,8 +86,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public TaskResponse createTask(CreateTaskRequest request, String username) {
-        AppUser user = userRepository.findByUsername(username);
+    public TaskResponse createTask(CreateTaskRequest request, UUID userId) {
+        AppUser user = userRepository.findById(userId).orElseThrow();
         Task task = taskMapper.mapCreateTaskRequestToTask(request);
         task.setUser(user);
         task = taskRepository.save(task);

@@ -15,10 +15,19 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = true)
     private String description;
+
+    @Column(nullable = false)
     private Boolean completed = false;
+
+    @Column(nullable = false)
     private Integer priority;
+
+    @Column(nullable = false)
     private Date dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)

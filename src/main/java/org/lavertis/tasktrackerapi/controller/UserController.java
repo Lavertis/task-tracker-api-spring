@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.lavertis.tasktrackerapi.config.AppUserAuthentication;
 import org.lavertis.tasktrackerapi.converter.UserMapper;
 import org.lavertis.tasktrackerapi.dto.user.CreateUserRequest;
 import org.lavertis.tasktrackerapi.dto.user.UpdateUserRequest;
@@ -29,29 +30,29 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(request));
     }
 
-    @GetMapping("/current")
+    @GetMapping("current")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get current user")
-    public ResponseEntity<UserResponse> getCurrentUser(Principal principal) {
-        AppUser user = userService.getUserByUsername(principal.getName());
+    public ResponseEntity<UserResponse> getCurrentUser(AppUserAuthentication auth) {
+        AppUser user = userService.getUserById(auth.getPrincipal().getId());
         UserResponse userResponse = userMapper.mapUserToUserResponse(user);
         return ResponseEntity.ok(userResponse);
     }
 
-    @PatchMapping("/current")
+    @PatchMapping("current")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Update current user")
     public ResponseEntity<UserResponse> updateCurrentUser(
             @RequestBody @Valid UpdateUserRequest request,
-            Principal principal
+            AppUserAuthentication auth
     ) {
-        return ResponseEntity.ok(userService.updateUser(principal.getName(), request));
+        return ResponseEntity.ok(userService.updateUser(auth.getPrincipal().getId(), request));
     }
 
-    @DeleteMapping("/current")
+    @DeleteMapping("current")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Delete current user")
-    public ResponseEntity<Boolean> deleteCurrentUser(Principal principal) {
-        return ResponseEntity.ok(userService.deleteUser(principal.getName()));
+    public ResponseEntity<Boolean> deleteCurrentUser(AppUserAuthentication auth) {
+        return ResponseEntity.ok(userService.deleteUser(auth.getPrincipal().getId()));
     }
 }

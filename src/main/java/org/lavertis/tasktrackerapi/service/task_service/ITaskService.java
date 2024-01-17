@@ -12,8 +12,8 @@ import java.util.UUID;
 @Repository
 public interface ITaskService {
     TaskResponse getTaskById(UUID id);
-    PagedResponse<TaskResponse> getTasks(TaskQuery taskQuery, String username);
-    TaskResponse createTask(CreateTaskRequest request, String username);
+    PagedResponse<TaskResponse> getUserTasks(TaskQuery taskQuery, UUID userId);
+    TaskResponse createTask(CreateTaskRequest request, UUID userId);
     TaskResponse updateTask(UUID id, UpdateTaskRequest request);
     void deleteTask(UUID id);
 }
