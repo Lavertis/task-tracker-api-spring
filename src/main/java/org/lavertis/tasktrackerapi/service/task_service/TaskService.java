@@ -13,14 +13,17 @@ import org.lavertis.tasktrackerapi.dto.task.CreateTaskRequest;
 import org.lavertis.tasktrackerapi.dto.task.TaskQuery;
 import org.lavertis.tasktrackerapi.dto.task.TaskResponse;
 import org.lavertis.tasktrackerapi.dto.task.UpdateTaskRequest;
+import org.lavertis.tasktrackerapi.entity.Tag;
 import org.lavertis.tasktrackerapi.entity.Task;
 import org.lavertis.tasktrackerapi.entity.AppUser;
+import org.lavertis.tasktrackerapi.repository.ITagRepository;
 import org.lavertis.tasktrackerapi.repository.ITaskRepository;
 import org.lavertis.tasktrackerapi.repository.IUserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -29,6 +32,7 @@ import java.util.stream.Stream;
 public class TaskService implements ITaskService {
     private ITaskRepository taskRepository;
     private IUserRepository userRepository;
+    private ITagRepository tagRepository;
     private EntityManager entityManager;
     private TaskMapper taskMapper;
 
@@ -92,9 +96,15 @@ public class TaskService implements ITaskService {
     @Override
     public TaskResponse createTask(CreateTaskRequest request, UUID userId) {
         AppUser user = userRepository.findById(userId).orElseThrow();
+        List<Tag> tags = null;
+        if (request.getTags() != null)
+            tags = tagRepository.findAllById(request.getTags());
+
         Task task = taskMapper.mapCreateTaskRequestToTask(request);
         task.setUser(user);
+        task.setTags(tags);
         task = taskRepository.save(task);
+
         return taskMapper.mapTaskToTaskResponse(task);
     }
 
@@ -111,6 +121,10 @@ public class TaskService implements ITaskService {
             task.setPriority(request.getPriority());
         if (request.getDueDate() != null)
             task.setDueDate(request.getDueDate());
+        if (request.getTags() != null) {
+            List<Tag> tags = tagRepository.findAllById(request.getTags());
+            task.setTags(tags);
+        }
 
         task = taskRepository.save(task);
         return taskMapper.mapTaskToTaskResponse(task);

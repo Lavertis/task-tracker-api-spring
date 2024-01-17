@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,4 +24,6 @@ public class UpdateTaskRequest {
 
     @FutureOrPresent(message = "Due date must be in the present or future")
     private Date dueDate;
+
+    private List<UUID> tags;
 }

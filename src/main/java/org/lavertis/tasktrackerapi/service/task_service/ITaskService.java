@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-@Repository
 public interface ITaskService {
     TaskResponse getTaskById(UUID id);
     PagedResponse<TaskResponse> getUserTasks(TaskQuery taskQuery, UUID userId);

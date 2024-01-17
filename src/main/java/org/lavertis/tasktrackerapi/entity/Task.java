@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -18,7 +20,6 @@ public class Task {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = true)
     private String description;
 
     @Column(nullable = false)
@@ -36,4 +37,10 @@ public class Task {
 
     @Column(name = "user_id", insertable=false, updatable=false)
     private UUID userId;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "task_tags",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private List<Tag> tags;
 }

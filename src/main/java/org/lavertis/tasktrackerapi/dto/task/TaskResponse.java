@@ -1,8 +1,10 @@
 package org.lavertis.tasktrackerapi.dto.task;
 
 import lombok.*;
+import org.lavertis.tasktrackerapi.dto.tag.TagResponse;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,4 +17,5 @@ public class TaskResponse {
     private Integer priority;
     private Date dueDate;
     private UUID userId;
+    private List<TagResponse> tags;
 }
