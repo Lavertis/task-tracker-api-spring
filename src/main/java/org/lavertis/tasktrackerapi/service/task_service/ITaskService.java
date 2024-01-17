@@ -16,4 +16,5 @@ public interface ITaskService {
     TaskResponse createTask(CreateTaskRequest request, UUID userId);
     TaskResponse updateTask(UUID id, UpdateTaskRequest request);
     void deleteTask(UUID id);
+    Boolean isUserTaskOwner(UUID taskId, UUID userId);
 }

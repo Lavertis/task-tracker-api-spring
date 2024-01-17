@@ -116,4 +116,10 @@ public class TaskService implements ITaskService {
     public void deleteTask(UUID id) {
         taskRepository.deleteById(id);
     }
+
+    @Override
+    public Boolean isUserTaskOwner(UUID taskId, UUID userId) {
+        Task task = taskRepository.findById(taskId).orElseThrow();
+        return task.getUserId().equals(userId);
+    }
 }
