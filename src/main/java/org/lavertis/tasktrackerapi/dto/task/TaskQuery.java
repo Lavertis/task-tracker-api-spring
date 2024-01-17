@@ -9,4 +9,5 @@ import org.lavertis.tasktrackerapi.dto.PaginationQuery;
 public class TaskQuery extends PaginationQuery {
     private String searchTitle;
     private Boolean hideCompleted;
+    private Integer priority = null;
 }

@@ -52,11 +52,15 @@ public class TaskService implements ITaskService {
         if (taskQuery.getHideCompleted() != null && taskQuery.getHideCompleted())
             completedPredicate = cb.equal(task.get("completed"), false);
 
+        Predicate priorityPredicate = null;
+        if (taskQuery.getPriority() != null)
+            priorityPredicate = cb.equal(task.get("priority"), taskQuery.getPriority());
+
         Predicate userPredicate = null;
         if (userId != null)
             userPredicate = cb.equal(task.get("user").get("id"), userId);
 
-        var predicates = Stream.of(titlePredicate, completedPredicate, userPredicate)
+        var predicates = Stream.of(titlePredicate, completedPredicate, userPredicate, priorityPredicate)
                 .filter(Objects::nonNull)
                 .toArray(Predicate[]::new);
         cq.where(predicates);
