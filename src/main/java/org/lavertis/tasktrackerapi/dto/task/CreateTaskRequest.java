@@ -4,6 +4,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 public class CreateTaskRequest {
     @NotEmpty(message = "Title cannot be empty")
     @Size(max = 64, message = "Title cannot be longer than 64 characters")
@@ -23,6 +25,8 @@ public class CreateTaskRequest {
 
     @NotNull(message = "Priority cannot be empty")
     private Integer priority;
+
+    private Boolean completed;
 
     @FutureOrPresent(message = "Due date must be in the present or future")
     private Date dueDate;

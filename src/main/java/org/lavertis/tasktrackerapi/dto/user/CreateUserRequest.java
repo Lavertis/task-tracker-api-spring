@@ -3,6 +3,7 @@ package org.lavertis.tasktrackerapi.dto.user;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.lavertis.tasktrackerapi.validation.unique_username.UniqueUsername;
@@ -10,6 +11,7 @@ import org.lavertis.tasktrackerapi.validation.unique_username.UniqueUsername;
 
 @Getter
 @Setter
+@Builder
 public class CreateUserRequest {
     @NotEmpty(message = "Email cannot be empty")
     @Email(message = "Email must be valid")
