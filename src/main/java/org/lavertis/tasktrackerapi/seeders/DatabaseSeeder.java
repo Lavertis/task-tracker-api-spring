@@ -26,7 +26,6 @@ import java.util.UUID;
 public class DatabaseSeeder implements ApplicationRunner {
 
     private final ITagRepository tagRepository;
-    private final IUserRepository userRepository;
     private final IUserService userService;
     private final ITaskRepository taskRepository;
     private final ITaskService taskService;
