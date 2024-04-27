@@ -1,4 +1,4 @@
-package com.lavertis.tasktrackerapi;
+package org.lavertis.tasktrackerapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
